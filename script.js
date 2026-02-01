@@ -12,7 +12,19 @@ let touchEndY = 0;
 const adicionaisDisponiveis = [
   { nome: "Bacon", preco: 7 },
   { nome: "Queijo", preco: 5 },
-  { nome: "Ovo", preco: 3 }
+  { nome: "Ovo", preco: 3 },
+  { nome: "cebola", preco: 2},
+{ nome: "tomate", preco: 2},
+  {nome: "milho", preco: 2},
+  {nome: "alface", preco: 2},
+  {nome: "salsicha", preco: 2},
+  {nome: "hamburguer", preco: 7},
+  {nome: "calabresa", preco: 6},
+  {nome: "frango desfiado", preco: 6},
+  {nome: "presunto e queijo", preco: 4},
+  {nome: "cheddar", preco:8},
+  {nome:"catupiry", preco: 8}
+  
 ];
 
 // ==========================================
@@ -465,3 +477,4 @@ function scrollToCart() {
     document.getElementById('cart-sidebar').scrollIntoView({ behavior: 'smooth' });
   }
 }
+
