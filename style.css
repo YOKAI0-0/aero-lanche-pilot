@@ -749,4 +749,102 @@ body {
     top: -6px;
     right: -6px;
   }
+  /* ESTILOS DOS ADICIONAIS COM QUANTIDADE */
+#lista-adicionais {
+  margin: 15px 0;
+  max-height: 300px;
+  overflow-y: auto;
 }
+
+.adicional-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  margin-bottom: 8px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.adicional-item.selecionado {
+  background: #e8f5e9;
+  border-color: var(--cor-secundaria);
+}
+
+.adicional-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.adicional-nome {
+  font-weight: bold;
+  color: #333;
+  font-size: 15px;
+}
+
+.adicional-preco {
+  font-size: 13px;
+  color: #666;
+}
+
+.adicional-controles {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-qtd {
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--cor-primaria);
+  background: white;
+  color: var(--cor-primaria);
+  border-radius: 50%;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 18px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-qtd:hover {
+  background: var(--cor-primaria);
+  color: white;
+  transform: scale(1.1);
+}
+
+.btn-qtd:active {
+  transform: scale(0.95);
+}
+
+.qtd-display {
+  font-weight: bold;
+  font-size: 18px;
+  min-width: 30px;
+  text-align: center;
+  color: #333;
+}
+
+/* Responsivo para mobile */
+@media (max-width: 600px) {
+  .adicional-item {
+    padding: 10px;
+  }
+  
+  .adicional-nome {
+    font-size: 14px;
+  }
+  
+  .btn-qtd {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+  }
+}
+
+
