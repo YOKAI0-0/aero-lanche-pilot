@@ -8,7 +8,6 @@ const VALOR_POR_KM = 2.00;
 let cartOpen = false;
 let touchStartY = 0;
 let touchEndY = 0;
-let lastScrollY = window.scrollY;
 
 const adicionaisDisponiveis = [
   { nome: "Bacon", preco: 7 },
@@ -37,66 +36,49 @@ document.addEventListener("DOMContentLoaded", () => {
         "<p style='text-align:center;color:#666;'>Erro ao carregar cardápio. Recarregue a página.</p>";
     });
 
-  // Event Listeners
+  // Event Listeners básicos
   document.getElementById("km").addEventListener("input", calcularTaxaEntrega);
   document.getElementById("cancelar").addEventListener("click", fecharModal);
   document.getElementById("confirmar").addEventListener("click", confirmarAdicionais);
   document.getElementById("finalizar").addEventListener("click", finalizarPedido);
   
-  // Setup do carrinho mobile
+  // Setup do carrinho mobile (só swipe para fechar, não para abrir)
   setupMobileCart();
 });
 
 // ==========================================
-// CARRINHO MOBILE (Swipe & Toggle)
+// CARRINHO MOBILE - SÓ POR TOQUE (SEM SCROLL)
 // ==========================================
 function setupMobileCart() {
-  // Detectar swipe
-  document.addEventListener('touchstart', (e) => {
+  const cartHeader = document.querySelector('.cart-header');
+  
+  // Clique no header abre/fecha (só mobile)
+  if (cartHeader) {
+    cartHeader.addEventListener('click', (e) => {
+      if (window.innerWidth <= 900) {
+        toggleCart();
+      }
+    });
+  }
+  
+  // Swipe down para fechar (dentro do carrinho)
+  const cartSidebar = document.getElementById('cart-sidebar');
+  
+  cartSidebar.addEventListener('touchstart', (e) => {
     touchStartY = e.changedTouches[0].screenY;
   }, {passive: true});
   
-  document.addEventListener('touchend', (e) => {
+  cartSidebar.addEventListener('touchend', (e) => {
     touchEndY = e.changedTouches[0].screenY;
-    handleSwipe();
-  }, {passive: true});
-  
-  // Detectar scroll para abrir/fechar automaticamente
-  window.addEventListener('scroll', () => {
-    if (window.innerWidth <= 900) {
-      handleScrollCart();
+    // Só fecha se arrastar para baixo e o carrinho estiver aberto
+    if (touchEndY - touchStartY > 50 && cartOpen && window.innerWidth <= 900) {
+      closeCart();
     }
   }, {passive: true});
 }
 
-function handleSwipe() {
-  const threshold = 50;
-  
-  // Swipe up (abre carrinho)
-  if (touchStartY - touchEndY > threshold && !cartOpen) {
-    openCart();
-  }
-  
-  // Swipe down (fecha carrinho)
-  if (touchEndY - touchStartY > threshold && cartOpen) {
-    closeCart();
-  }
-}
-
-function handleScrollCart() {
-  const currentScrollY = window.scrollY;
-  
-  // Se rolou para cima rápido e está no meio da página
-  if (lastScrollY > currentScrollY && (currentScrollY > 200) && !cartOpen) {
-    // Opcional: abrir automaticamente ao rolar para cima
-    // openCart(); 
-  }
-  
-  lastScrollY = currentScrollY;
-}
-
 function toggleCart() {
-  if (window.innerWidth > 900) return; // Só mobile
+  if (window.innerWidth > 900) return;
   
   if (cartOpen) {
     closeCart();
@@ -115,7 +97,7 @@ function openCart() {
   overlay.classList.add('show');
   cartOpen = true;
   
-  // Previne scroll do body
+  // Previne scroll do body quando carrinho aberto
   document.body.style.overflow = 'hidden';
 }
 
@@ -215,25 +197,21 @@ function darFeedbackBotao(botao) {
     setTimeout(() => card.classList.remove('added'), 500);
   }
   
-  // Feedback visual no header mobile (pulsar)
+  // Feedback no header do carrinho mobile
   if (window.innerWidth <= 900) {
-    pulseCart();
+    const header = document.querySelector('.cart-header');
+    if (header) {
+      header.style.background = '#e8f5e9';
+      setTimeout(() => {
+        header.style.background = '';
+      }, 300);
+    }
   }
   
   setTimeout(() => {
     botao.textContent = textoOriginal;
     botao.classList.remove("added");
   }, 1500);
-}
-
-function pulseCart() {
-  const header = document.querySelector('.cart-header');
-  if (header) {
-    header.style.background = '#e8f5e9';
-    setTimeout(() => {
-      header.style.background = '';
-    }, 300);
-  }
 }
 
 // ==========================================
@@ -304,12 +282,6 @@ function adicionarAoCarrinho(item, observacao, adicionais = []) {
   atualizarCarrinho();
   atualizarBadges();
   salvarCarrinho();
-  
-  // No mobile, abre o carrinho brevemente para mostrar que adicionou (opcional)
-  if (window.innerWidth <= 900 && !cartOpen) {
-    // Pode descomentar a linha abaixo se quiser que abra automaticamente:
-    // openCart();
-  }
 }
 
 function atualizarCarrinho() {
