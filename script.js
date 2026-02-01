@@ -49,6 +49,129 @@ function renderizarCardapio(cardapio) {
 
     container.appendChild(secao);
   }
+  // Variáveis para controle do carrinho mobile
+let lastScrollY = window.scrollY;
+let cartOpen = false;
+
+document.addEventListener('DOMContentLoaded', () => {
+  // ... seu código existente ...
+  
+  // Controle do carrinho mobile (swipe e scroll)
+  setupMobileCart();
+});
+
+function setupMobileCart() {
+  const cartHeader = document.querySelector('.cart-header');
+  const cartSidebar = document.getElementById('cart-sidebar');
+  
+  // Clique no header abre/fecha
+  if (cartHeader) {
+    cartHeader.addEventListener('click', toggleCart);
+    cartHeader.style.cursor = 'pointer'; // Indica que é clicável
+  }
+  
+  // Detectar scroll para auto-mostrar/esconder (só mobile)
+  if (window.innerWidth <= 900) {
+    let ticking = false;
+    
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    });
+    
+    // Gestos de toque (swipe up/down)
+    let touchStartY = 0;
+    let touchEndY = 0;
+    
+    document.addEventListener('touchstart', (e) => {
+      touchStartY = e.changedTouches[0].screenY;
+    }, {passive: true});
+    
+    document.addEventListener('touchend', (e) => {
+      touchEndY = e.changedTouches[0].screenY;
+      handleSwipe();
+    }, {passive: true});
+  }
+}
+
+function handleScroll() {
+  const currentScrollY = window.scrollY;
+  const cartSidebar = document.getElementById('cart-sidebar');
+  
+  // Se rolou para cima (scroll diminuiu) e carrinho estava fechado -> abre
+  if (lastScrollY > currentScrollY && currentScrollY > 100 && !cartOpen) {
+    openCart();
+  }
+  
+  // Se rolou para baixo rápido e carrinho aberto -> fecha
+  if (lastScrollY < currentScrollY && cartOpen && (currentScrollY - lastScrollY > 5)) {
+    closeCart();
+  }
+  
+  lastScrollY = currentScrollY;
+}
+
+function handleSwipe() {
+  const swipeThreshold = 50; // pixels
+  
+  // Swipe up (abre carrinho)
+  if (touchStartY - touchEndY > swipeThreshold && !cartOpen) {
+    openCart();
+  }
+  
+  // Swipe down (fecha carrinho)
+  if (touchEndY - touchStartY > swipeThreshold && cartOpen) {
+    closeCart();
+  }
+}
+
+function toggleCart() {
+  if (cartOpen) {
+    closeCart();
+  } else {
+    openCart();
+  }
+}
+
+function openCart() {
+  if (window.innerWidth > 900) return; // Só mobile
+  
+  const cart = document.getElementById('cart-sidebar');
+  const overlay = document.getElementById('cart-overlay');
+  
+  cart.classList.add('open');
+  overlay.classList.add('show');
+  cartOpen = true;
+  
+  // Previne scroll do body quando carrinho aberto
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCart() {
+  const cart = document.getElementById('cart-sidebar');
+  const overlay = document.getElementById('cart-overlay');
+  
+  cart.classList.remove('open');
+  overlay.classList.remove('show');
+  cartOpen = false;
+  
+  // Libera scroll do body
+  document.body.style.overflow = '';
+}
+
+// Atualize a função scrollToCart para abrir o carrinho no mobile
+function scrollToCart() {
+  if (window.innerWidth <= 900) {
+    openCart();
+  } else {
+    document.getElementById('cart-sidebar').scrollIntoView({ behavior: 'smooth' });
+  }
+}
 }
 
 function criarCard(item, categoria, index) {
@@ -355,3 +478,4 @@ function carregarCarrinho() {
 function scrollToCart() {
   document.getElementById('cart-sidebar').scrollIntoView({ behavior: 'smooth' });
 }
+
