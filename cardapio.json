@@ -1,0 +1,174 @@
+
+{
+  "burguer": [
+    {
+      "nome": "X-Salada",
+      "preco": 20,
+      "temAdicionais":true,
+      "ingredientes": ["Pão", "Maionese", "Ketchup", "Alface", "Tomate", "Presunto", "Queijo", "Hambúrguer artesanal", "Batata palha"]
+    },
+    {
+      "nome": "X-Salada Duplo",
+      "preco": 26,
+       "temAdicionais": true,
+      "ingredientes": ["Pão", "Maionese", "Ketchup", "Alface", "Tomate", "Presunto", "Queijo", "2 Hambúrgueres artesanais", "Batata palha"]
+    },
+    {
+      "nome": "X-Burguer",
+      "preco": 19,
+       "temAdicionais": true,
+      "ingredientes": ["Pão", "Maionese", "Ketchup", "Hambúrguer artesanal", "Queijo duplo", "Batata palha"]
+    },
+    {
+      "nome": "X-Egg",
+      "preco": 21,
+       "temAdicionais": true,
+      "ingredientes": ["Pão", "Maionese", "Ketchup", "Alface", "Tomate", "Hambúrguer artesanal", "Ovo", "Presunto", "Queijo", "Batata palha"]
+    },
+    {
+      "nome": "X-Bacon",
+      "preco": 25,
+       "temAdicionais": true,
+      "ingredientes": ["Pão", "Maionese", "Ketchup", "Alface", "Tomate", "Hambúrguer artesanal", "Bacon", "Presunto", "Queijo", "Batata palha"]
+    },
+    {
+      "nome": "X-Calabresa",
+      "preco": 20,
+       "temAdicionais": true,
+      "ingredientes": ["Pão", "Maionese", "Ketchup", "Alface", "Tomate", "Calabresa", "Presunto", "Queijo", "Batata palha"]
+    },
+    {
+      "nome": "X-Frango",
+      "preco": 18,
+       "temAdicionais": true,
+      "ingredientes": ["Pão", "Maionese", "Ketchup", "Alface", "Tomate", "Frango desfiado", "Presunto", "Queijo", "Batata palha"]
+    },
+    {
+      "nome": "X-Frango com Catupiry",
+      "preco": 24,
+       "temAdicionais": true,
+      "ingredientes": ["Pão", "Maionese", "Ketchup", "Alface", "Tomate", "Frango desfiado", "Catupiry", "Presunto", "Queijo", "Batata palha"]
+    },
+    {
+      "nome": "X-Frango com Hambúrguer",
+      "preco": 24,
+       "temAdicionais": true,
+      "ingredientes": ["Pão", "Maionese", "Ketchup", "Alface", "Tomate", "Hambúrguer artesanal", "Frango desfiado", "Presunto", "Queijo", "Batata palha"]
+    },
+    {
+      "nome": "X-Frango Especial",
+      "preco": 25,
+       "temAdicionais": true,
+      "ingredientes": ["Pão", "Maionese", "Ketchup", "Alface", "Tomate", "Milho", "Frango desfiado", "Bacon", "Salsicha", "Presunto", "Batata palha"]
+    },
+    {
+      "nome": "X-Alcatra",
+      "preco": 35,
+       "temAdicionais": true,
+      "ingredientes": ["Pão", "Maionese", "Ketchup", "Alface", "Tomate", "Alcatra", "Queijo", "Batata palha"]
+    },
+    {
+      "nome": "X-Da Casa",
+      "preco": 33,
+       "temAdicionais": true,
+      "ingredientes": ["Pão", "Maionese", "Ketchup", "Alface", "Tomate", "Milho", "Bacon", "Frango", "Hambúrguer artesanal", "Ovo", "2 Salsichas", "Presunto", "Queijo", "Batata palha"]
+    },
+    {
+      "nome": "X-Vegetariano",
+      "preco": 20,
+       "temAdicionais": true,
+      "ingredientes": ["Pão", "Maionese", "Ketchup", "Alface", "Tomate", "Milho", "Cebola", "2 Ovos", "Queijo", "Batata palha"]
+    },
+    {
+      "nome": "X-Misto Quente",
+      "preco": 13,
+       "temAdicionais": true,
+      "ingredientes": ["Pão", "Maionese", "Ketchup", "Presunto duplo", "Queijo duplo"]
+    }
+  ],
+
+  "dogs": [
+    {
+      "nome": "Dog Simples",
+      "preco": 10,
+       "temAdicionais": true,
+      "ingredientes": ["Pão", "Maionese", "Ketchup", "Tomate", "Salsicha", "Batata palha"]
+    },
+    {
+      "nome": "Dog Duplo",
+      "preco": 12,
+       "temAdicionais": true,
+      "ingredientes": ["Pão", "Maionese", "Ketchup", "Tomate", "2 Salsichas", "Batata palha"]
+    },
+    {
+      "nome": "Dog Duplo com Queijo",
+      "preco": 16,
+       "temAdicionais": true,
+      "ingredientes": ["Pão", "Maionese", "Ketchup", "Tomate", "2 Salsichas", "Queijo", "Batata palha"]
+    },
+    {
+      "nome": "Dog Burguer",
+      "preco": 17,
+       "temAdicionais": true,
+      "ingredientes": ["Pão", "Maionese", "Ketchup", "Tomate", "Hambúrguer", "Salsicha", "Batata palha"]
+    },
+    {
+      "nome": "Dog Bacon",
+      "preco": 17,
+      "temAdicionais": true,
+      "ingredientes": ["Pão", "Maionese", "Ketchup", "Tomate", "Bacon", "Salsicha", "Batata palha"]
+    },
+    {
+      "nome": "Dog Bacon Cheddar",
+      "preco": 24,
+      "temAdicionais": true,
+      "ingredientes": ["Pão", "Maionese", "Ketchup", "Tomate", "Bacon", "Salsicha", "Cheddar", "Batata palha"]
+    },
+    {
+      "nome": "Dog Frango",
+      "preco": 14,
+      "temAdicionais": true,
+      "ingredientes": ["Pão", "Maionese", "Ketchup", "Tomate", "Frango desfiado", "Salsicha", "Batata palha"]
+    },
+    {
+      "nome": "Dog Frango com Catupiry",
+      "preco": 21,
+      "temAdicionais":true,
+
+      "ingredientes": ["Pão", "Maionese", "Ketchup", "Tomate", "Frango desfiado", "Salsicha", "Catupiry", "Batata palha"]
+    },
+    {
+      "nome": "Dog da Casa",
+      "preco": 23,
+      "temAdicionais": true,
+      "ingredientes": ["Pão", "Maionese", "Ketchup", "Tomate", "Milho", "Bacon", "Frango", "Salsicha", "Presunto", "Queijo", "Batata palha"]
+    }
+  ],
+
+  "porcoes": [
+    { "nome": "Batata Individual", "preco": 8 },
+    { "nome": "Batata Porção", "preco": 15 },
+    { "nome": "Batata com Bacon e Cheddar", "preco": 30 },
+    { "nome": "Calabresa Acebolada", "preco": 20 }
+  ],
+
+  "bebidas": [
+    { "nome": "Água com gás", "preco": 4 },
+    { "nome": "Água sem gás", "preco": 4 },
+    { "nome": "Refrigerante Lata", "preco": 6 }
+ ],
+ 
+   "refrigerantes_600ml": [
+    { "nome": "Coca-Cola", "preco": 8 },
+    { "nome": "Guaraná", "preco": 8 },
+    { "nome": "Fanta", "preco": 8 },
+    { "nome": "Suco Pequeno", "preco": 8 },
+    { "nome": "Suco Grande", "preco": 15 }
+  ],
+
+  "cervejas": [
+    { "nome": "Amstel", "preco": 6 },
+    { "nome": "Skol", "preco": 6 },
+    { "nome": "Heineken", "preco": 10 }
+  ]
+}

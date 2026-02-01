@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta name="description" content="Aero Lanche - Melhor hamburgueria artesanal da cidade. Delivery rápido, lanches frescos e suculentos.">
+<meta name="keywords" content="hamburgueria, delivery, lanche, hamburguer artesanal, londrina">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aero Lanche</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div id="modal-adicionais" class="modal hidden">
+    <div class="modal-content">
+      <h3 id="modal-titulo"></h3>
+      <div id="lista-adicionais"></div>
+      <textarea id="modal-obs" placeholder="Observações (ex: sem cebola)"></textarea>
+      <div class="modal-botoes">
+        <button id="cancelar">Cancelar</button>
+        <button id="confirmar">Adicionar</button>
+      </div>
+    </div>
+  </div>
+
+  <header class="topo">
+    <h1>🍔 Aero Lanche</h1>
+  </header>
+
+  <main>
+    <!-- CARDÁPIO -->
+    <div id="cardapio"></div>
+
+    <hr />
+
+    <!-- CARRINHO -->
+    <section id="carrinho-container">
+      <h2>🛒 Carrinho</h2>
+      <ul id="lista-carrinho"></ul>
+
+      <div class="totais">
+        <p>Subtotal: R$ <span id="subtotal">0,00</span></p>
+        
+        <div class="entrega">
+          <label>Distância (km):</label>
+          <input type="number" id="km" step="0.1" placeholder="Ex: 3.2" min="0">
+          <p>Taxa de entrega: R$ <span id="taxa">0,00</span></p>
+        </div>
+
+        <p class="total-final">Total: R$ <span id="total">0,00</span></p>
+      </div>
+
+      <button id="finalizar">Finalizar Pedido no WhatsApp</button>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

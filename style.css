@@ -1,0 +1,413 @@
+/* MELHORIA: Variáveis CSS para cores - fácil mudar depois */
+:root {
+  --cor-primaria: #c62828;    /* Vermelho lanche */
+  --cor-secundaria: #2e7d32;  /* Verde botão */
+  --cor-fundo: #f4f4f4;
+  --cor-card: #ffffff;
+  --sombra: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+* {
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Arial, sans-serif; /* Fonte mais moderna */
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--cor-fundo);
+  padding-bottom: 20px; /* Espaço no final */
+  max-width: 800px;     /* Limita largura no desktop, fica melhor */
+  margin: 0 auto;       /* Centraliza no desktop */
+}
+
+/* HEADER */
+.topo {
+  background: var(--cor-primaria);
+  color: #fff;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+.topo h1 {
+  font-size: 28px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* CATEGORIAS */
+.categoria {
+  padding: 0 12px;
+  margin-bottom: 20px;
+}
+
+.categoria h2 {
+  margin: 16px 0 12px 0;
+  color: var(--cor-primaria);
+  border-bottom: 2px solid var(--cor-primaria);
+  padding-bottom: 5px;
+  text-transform: uppercase;
+  font-size: 20px;
+}
+
+/* CARDS - Removi duplicação */
+.card {
+  background: var(--cor-card);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+  box-shadow: var(--sombra);
+  display: flex;
+  gap: 12px;
+  transition: transform 0.2s; /* Efeito suave ao passar mouse */
+}
+
+.card:hover {
+  transform: translateY(-2px); /* Levanta card ao passar mouse */
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+.card-img {
+  width: 90px;
+  height: 90px;
+  background: linear-gradient(135deg, #e0e0e0, #f0f0f0); /* Gradiente mais bonito */
+  border-radius: 8px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #999;
+  border: 1px dashed #ccc;
+}
+
+.card-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card-info h3 {
+  margin: 0;
+  font-size: 17px;
+  color: #333;
+}
+
+.descricao {
+  font-size: 13px;
+  color: #666;
+  margin: 6px 0;
+  line-height: 1.4;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+}
+
+.preco {
+  font-weight: bold;
+  font-size: 16px;
+  color: var(--cor-primaria);
+}
+
+.botao {
+  background: var(--cor-secundaria);
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.botao:hover {
+  background: #1b5e20; /* Verde mais escuro */
+}
+
+/* CARRINHO */
+#carrinho-container {
+  padding: 0 12px;
+}
+
+#lista-carrinho {
+  list-style: none;
+  margin: 15px 0;
+  background: var(--cor-card);
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: var(--sombra);
+}
+
+#lista-carrinho li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+#lista-carrinho li:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.controles {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.controles button {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.controles button:hover {
+  background: #f0f0f0;
+}
+
+.controles button[data-acao="mais"] {
+  background: var(--cor-secundaria);
+  color: white;
+  border-color: var(--cor-secundaria);
+}
+
+.lixeira {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 0 5px;
+  transition: transform 0.2s;
+}
+
+.lixeira:hover {
+  transform: scale(1.2);
+}
+
+/* TOTAIS */
+.totais {
+  background: var(--cor-card);
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: var(--sombra);
+  margin: 15px 0;
+}
+
+.totais p {
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.total-final {
+  font-size: 20px;
+  font-weight: bold;
+  color: var(--cor-primaria);
+  border-top: 2px solid #eee;
+  padding-top: 10px;
+  margin-top: 10px;
+}
+
+/* ENTREGA */
+.entrega {
+  margin: 10px 0;
+  padding: 10px 0;
+  border-top: 1px dashed #ddd;
+  border-bottom: 1px dashed #ddd;
+}
+
+.entrega label {
+  font-weight: bold;
+  color: #555;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.entrega input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+.entrega input:focus {
+  outline: none;
+  border-color: var(--cor-primaria);
+}
+
+/* BOTÃO FINALIZAR */
+#finalizar {
+  width: 100%;
+  padding: 15px;
+  background: #25d366; /* Cor do WhatsApp */
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: background 0.3s;
+  margin-top: 10px;
+}
+
+#finalizar:hover {
+  background: #128c7e;
+}
+
+/* MODAL */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7); /* Mais escuro para destacar */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(3px); /* Efeito desfoque no fundo (moderno) */
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: #fff;
+  width: 90%;
+  max-width: 400px;
+  padding: 25px;
+  border-radius: 15px;
+  animation: slideIn 0.3s ease-out; /* Animação suave */
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-content h3 {
+  margin-bottom: 15px;
+  color: var(--cor-primaria);
+  font-size: 22px;
+}
+
+#lista-adicionais {
+  margin: 15px 0;
+}
+
+#lista-adicionais label {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  margin-bottom: 5px;
+  background: #f9f9f9;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#lista-adicionais label:hover {
+  background: #f0f0f0;
+}
+
+#lista-adicionais input[type="checkbox"] {
+  margin-right: 10px;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--cor-primaria); /* Cor do checkbox */
+}
+
+.modal-content textarea {
+  width: 100%;
+  height: 80px;
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  resize: vertical; /* Permite aumentar só vertical */
+  font-family: inherit;
+}
+
+.modal-botoes {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.modal-botoes button {
+  flex: 1; /* Botões com mesmo tamanho */
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  transition: all 0.2s;
+}
+
+#confirmar {
+  background: var(--cor-secundaria);
+  color: #fff;
+}
+
+#confirmar:hover {
+  background: #1b5e20;
+}
+
+#cancelar {
+  background: #f0f0f0;
+  color: #333;
+}
+
+#cancelar:hover {
+  background: #e0e0e0;
+}
+
+/* RESPONSIVIDADE MOBILE */
+@media (max-width: 600px) {
+  .card {
+    padding: 10px;
+  }
+  
+  .card-img {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .card-info h3 {
+    font-size: 15px;
+  }
+  
+  .topo h1 {
+    font-size: 24px;
+  }
+}
