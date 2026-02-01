@@ -8,7 +8,6 @@
 </head>
 
 <body>
-  <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
   <!-- MODAL ADICIONAIS -->
   <div id="modal-adicionais" class="modal hidden">
     <div class="modal-content">
@@ -22,7 +21,10 @@
     </div>
   </div>
 
-  <!-- HEADER FIXO COM CARRINHO RESUMIDO (MOBILE) -->
+  <!-- OVERLAY PARA FECHAR CARRINHO (MOBILE) -->
+  <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
+
+  <!-- HEADER FIXO -->
   <header class="topo">
     <div class="header-content">
       <h1>🍔 Aero Lanche</h1>
@@ -33,46 +35,45 @@
   </header>
 
   <div class="app-container">
-    <!-- ÁREA DO CARDÁPIO (Scrollável) -->
+    <!-- ÁREA DO CARDÁPIO -->
     <main class="menu-area">
       <div id="cardapio"></div>
-      
-      <!-- Espaço para não ficar atrás do carrinho fixo (mobile) -->
       <div class="spacer"></div>
     </main>
 
-    <!-- CARRINHO FIXO (Sidebar/Desktop | Bottom/Mobile) -->
+    <!-- CARRINHO FIXO -->
     <aside class="cart-sidebar" id="cart-sidebar">
-      <div class="cart-header">
-        <h2>🛒 Seu Pedido</h2>
-        <span class="cart-count" id="cart-count">0 itens</span>
+      <div class="cart-header" onclick="toggleCart()">
+        <h2>🛒 Seu Pedido <span class="cart-count" id="cart-count">0 itens</span></h2>
       </div>
       
-      <ul id="lista-carrinho" class="cart-items">
-        <li class="empty-cart">Seu carrinho está vazio</li>
-      </ul>
+      <div class="cart-content">
+        <ul id="lista-carrinho" class="cart-items">
+          <li class="empty-cart">Seu carrinho está vazio</li>
+        </ul>
 
-      <div class="cart-footer">
-        <div class="entrega">
-          <label>📍 Distância (km):</label>
-          <input type="number" id="km" step="0.1" placeholder="Ex: 3.2" min="0">
-          <p class="taxa-line">Taxa de entrega: <strong>R$ <span id="taxa">0,00</span></strong></p>
-        </div>
-
-        <div class="totals">
-          <div class="subtotal-line">
-            <span>Subtotal:</span>
-            <strong>R$ <span id="subtotal">0,00</span></strong>
+        <div class="cart-footer">
+          <div class="entrega">
+            <label>📍 Distância (km):</label>
+            <input type="number" id="km" step="0.1" placeholder="Ex: 3.2" min="0">
+            <p class="taxa-line">Taxa de entrega: <strong>R$ <span id="taxa">0,00</span></strong></p>
           </div>
-          <div class="total-line">
-            <span>Total:</span>
-            <strong>R$ <span id="total">0,00</span></strong>
-          </div>
-        </div>
 
-        <button id="finalizar" class="checkout-btn">
-          Finalizar Pedido
-        </button>
+          <div class="totals">
+            <div class="subtotal-line">
+              <span>Subtotal:</span>
+              <strong>R$ <span id="subtotal">0,00</span></strong>
+            </div>
+            <div class="total-line">
+              <span>Total:</span>
+              <strong>R$ <span id="total">0,00</span></strong>
+            </div>
+          </div>
+
+          <button id="finalizar" class="checkout-btn">
+            Finalizar Pedido
+          </button>
+        </div>
       </div>
     </aside>
   </div>
@@ -80,4 +81,3 @@
   <script src="script.js"></script>
 </body>
 </html>
-
