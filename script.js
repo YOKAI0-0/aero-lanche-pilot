@@ -1,7 +1,14 @@
+// ==========================================
+// VARIÁVEIS GLOBAIS
+// ==========================================
 let carrinho = [];
 let itemSelecionado = null;
 let taxaEntrega = 0;
 const VALOR_POR_KM = 2.00;
+let cartOpen = false;
+let touchStartY = 0;
+let touchEndY = 0;
+let lastScrollY = window.scrollY;
 
 const adicionaisDisponiveis = [
   { nome: "Bacon", preco: 7 },
@@ -9,128 +16,88 @@ const adicionaisDisponiveis = [
   { nome: "Ovo", preco: 3 }
 ];
 
-let cardapioData = {};
-
+// ==========================================
+// INICIALIZAÇÃO
+// ==========================================
 document.addEventListener("DOMContentLoaded", () => {
   carregarCarrinho();
   
   fetch("cardapio.json")
-    .then(res => res.json())
+    .then(res => {
+      if (!res.ok) throw new Error("Erro ao carregar cardápio");
+      return res.json();
+    })
     .then(data => {
-      cardapioData = data;
       renderizarCardapio(data);
-      atualizarBadges(); 
+      atualizarBadges();
+    })
+    .catch(err => {
+      console.error("Erro:", err);
+      document.getElementById("cardapio").innerHTML = 
+        "<p style='text-align:center;color:#666;'>Erro ao carregar cardápio. Recarregue a página.</p>";
     });
 
+  // Event Listeners
   document.getElementById("km").addEventListener("input", calcularTaxaEntrega);
   document.getElementById("cancelar").addEventListener("click", fecharModal);
   document.getElementById("confirmar").addEventListener("click", confirmarAdicionais);
   document.getElementById("finalizar").addEventListener("click", finalizarPedido);
-});
-
-function renderizarCardapio(cardapio) {
-  const container = document.getElementById("cardapio");
-
-  for (const categoria in cardapio) {
-    if (!Array.isArray(cardapio[categoria])) continue;
-
-    const secao = document.createElement("section");
-    secao.className = "categoria";
-    secao.dataset.categoria = categoria;
-
-    const titulo = document.createElement("h2");
-    titulo.textContent = formatarNomeCategoria(categoria);
-    secao.appendChild(titulo);
-
-    cardapio[categoria].forEach((item, index) => {
-      const card = criarCard(item, categoria, index);
-      secao.appendChild(card);
-    });
-
-    container.appendChild(secao);
-  }
-  // Variáveis para controle do carrinho mobile
-let lastScrollY = window.scrollY;
-let cartOpen = false;
-
-document.addEventListener('DOMContentLoaded', () => {
-  // ... seu código existente ...
   
-  // Controle do carrinho mobile (swipe e scroll)
+  // Setup do carrinho mobile
   setupMobileCart();
 });
 
+// ==========================================
+// CARRINHO MOBILE (Swipe & Toggle)
+// ==========================================
 function setupMobileCart() {
-  const cartHeader = document.querySelector('.cart-header');
-  const cartSidebar = document.getElementById('cart-sidebar');
+  // Detectar swipe
+  document.addEventListener('touchstart', (e) => {
+    touchStartY = e.changedTouches[0].screenY;
+  }, {passive: true});
   
-  // Clique no header abre/fecha
-  if (cartHeader) {
-    cartHeader.addEventListener('click', toggleCart);
-    cartHeader.style.cursor = 'pointer'; // Indica que é clicável
-  }
+  document.addEventListener('touchend', (e) => {
+    touchEndY = e.changedTouches[0].screenY;
+    handleSwipe();
+  }, {passive: true});
   
-  // Detectar scroll para auto-mostrar/esconder (só mobile)
-  if (window.innerWidth <= 900) {
-    let ticking = false;
-    
-    window.addEventListener('scroll', () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          handleScroll();
-          ticking = false;
-        });
-        ticking = true;
-      }
-    });
-    
-    // Gestos de toque (swipe up/down)
-    let touchStartY = 0;
-    let touchEndY = 0;
-    
-    document.addEventListener('touchstart', (e) => {
-      touchStartY = e.changedTouches[0].screenY;
-    }, {passive: true});
-    
-    document.addEventListener('touchend', (e) => {
-      touchEndY = e.changedTouches[0].screenY;
-      handleSwipe();
-    }, {passive: true});
-  }
+  // Detectar scroll para abrir/fechar automaticamente
+  window.addEventListener('scroll', () => {
+    if (window.innerWidth <= 900) {
+      handleScrollCart();
+    }
+  }, {passive: true});
 }
 
-function handleScroll() {
-  const currentScrollY = window.scrollY;
-  const cartSidebar = document.getElementById('cart-sidebar');
+function handleSwipe() {
+  const threshold = 50;
   
-  // Se rolou para cima (scroll diminuiu) e carrinho estava fechado -> abre
-  if (lastScrollY > currentScrollY && currentScrollY > 100 && !cartOpen) {
+  // Swipe up (abre carrinho)
+  if (touchStartY - touchEndY > threshold && !cartOpen) {
     openCart();
   }
   
-  // Se rolou para baixo rápido e carrinho aberto -> fecha
-  if (lastScrollY < currentScrollY && cartOpen && (currentScrollY - lastScrollY > 5)) {
+  // Swipe down (fecha carrinho)
+  if (touchEndY - touchStartY > threshold && cartOpen) {
     closeCart();
+  }
+}
+
+function handleScrollCart() {
+  const currentScrollY = window.scrollY;
+  
+  // Se rolou para cima rápido e está no meio da página
+  if (lastScrollY > currentScrollY && (currentScrollY > 200) && !cartOpen) {
+    // Opcional: abrir automaticamente ao rolar para cima
+    // openCart(); 
   }
   
   lastScrollY = currentScrollY;
 }
 
-function handleSwipe() {
-  const swipeThreshold = 50; // pixels
-  
-  // Swipe up (abre carrinho)
-  if (touchStartY - touchEndY > swipeThreshold && !cartOpen) {
-    openCart();
-  }
-  
-  // Swipe down (fecha carrinho)
-  if (touchEndY - touchStartY > swipeThreshold && cartOpen) {
-    closeCart();
-  }
-}
-
 function toggleCart() {
+  if (window.innerWidth > 900) return; // Só mobile
+  
   if (cartOpen) {
     closeCart();
   } else {
@@ -139,7 +106,7 @@ function toggleCart() {
 }
 
 function openCart() {
-  if (window.innerWidth > 900) return; // Só mobile
+  if (window.innerWidth > 900) return;
   
   const cart = document.getElementById('cart-sidebar');
   const overlay = document.getElementById('cart-overlay');
@@ -148,7 +115,7 @@ function openCart() {
   overlay.classList.add('show');
   cartOpen = true;
   
-  // Previne scroll do body quando carrinho aberto
+  // Previne scroll do body
   document.body.style.overflow = 'hidden';
 }
 
@@ -164,20 +131,35 @@ function closeCart() {
   document.body.style.overflow = '';
 }
 
-// Atualize a função scrollToCart para abrir o carrinho no mobile
-function scrollToCart() {
-  if (window.innerWidth <= 900) {
-    openCart();
-  } else {
-    document.getElementById('cart-sidebar').scrollIntoView({ behavior: 'smooth' });
+// ==========================================
+// CARDÁPIO
+// ==========================================
+function renderizarCardapio(cardapio) {
+  const container = document.getElementById("cardapio");
+
+  for (const categoria in cardapio) {
+    if (!Array.isArray(cardapio[categoria])) continue;
+
+    const secao = document.createElement("section");
+    secao.className = "categoria";
+
+    const titulo = document.createElement("h2");
+    titulo.textContent = formatarNomeCategoria(categoria);
+    secao.appendChild(titulo);
+
+    cardapio[categoria].forEach(item => {
+      const card = criarCard(item);
+      secao.appendChild(card);
+    });
+
+    container.appendChild(secao);
   }
 }
-}
 
-function criarCard(item, categoria, index) {
+function criarCard(item) {
   const card = document.createElement("div");
   card.className = "card";
-  card.dataset.nome = item.nome; 
+  card.dataset.nome = item.nome;
   
   const badge = document.createElement("div");
   badge.className = "item-quantidade";
@@ -185,7 +167,7 @@ function criarCard(item, categoria, index) {
   badge.id = `badge-${item.nome.replace(/\s+/g, '-')}`;
   
   card.innerHTML = `
-    <div class="card-img">🍔</div>
+    <div class="card-img">${getEmoji(item.nome)}</div>
     <div class="card-info">
       <h3>${item.nome}</h3>
       ${item.ingredientes ? `<p class="descricao">${item.ingredientes.join(", ")}</p>` : ""}
@@ -200,7 +182,6 @@ function criarCard(item, categoria, index) {
 
   const botao = card.querySelector(".botao");
   botao.addEventListener("click", () => {
-  
     darFeedbackBotao(botao);
     
     if (item.temAdicionais) {
@@ -213,12 +194,20 @@ function criarCard(item, categoria, index) {
   return card;
 }
 
+function getEmoji(nome) {
+  if (nome.toLowerCase().includes('burg')) return '🍔';
+  if (nome.toLowerCase().includes('dog')) return '🌭';
+  if (nome.toLowerCase().includes('batata')) return '🍟';
+  if (nome.toLowerCase().includes('bebida') || nome.toLowerCase().includes('refri')) return '🥤';
+  if (nome.toLowerCase().includes('cerveja')) return '🍺';
+  return '🍽️';
+}
+
 function darFeedbackBotao(botao) {
   const textoOriginal = botao.textContent;
   
   botao.textContent = "✓ Adicionado!";
   botao.classList.add("added");
-  
   
   const card = botao.closest('.card');
   if (card) {
@@ -226,6 +215,10 @@ function darFeedbackBotao(botao) {
     setTimeout(() => card.classList.remove('added'), 500);
   }
   
+  // Feedback visual no header mobile (pulsar)
+  if (window.innerWidth <= 900) {
+    pulseCart();
+  }
   
   setTimeout(() => {
     botao.textContent = textoOriginal;
@@ -233,12 +226,63 @@ function darFeedbackBotao(botao) {
   }, 1500);
 }
 
+function pulseCart() {
+  const header = document.querySelector('.cart-header');
+  if (header) {
+    header.style.background = '#e8f5e9';
+    setTimeout(() => {
+      header.style.background = '';
+    }, 300);
+  }
+}
+
+// ==========================================
+// MODAL ADICIONAIS
+// ==========================================
+function abrirModal(item) {
+  itemSelecionado = item;
+  document.getElementById("modal-titulo").textContent = item.nome;
+  document.getElementById("modal-obs").value = "";
+  
+  const lista = document.getElementById("lista-adicionais");
+  lista.innerHTML = "";
+  
+  adicionaisDisponiveis.forEach((a, i) => {
+    const label = document.createElement("label");
+    label.innerHTML = `
+      <input type="checkbox" value="${i}">
+      ${a.nome} (+R$ ${formatarPreco(a.preco)})
+    `;
+    lista.appendChild(label);
+  });
+  
+  document.getElementById("modal-adicionais").classList.remove("hidden");
+}
+
+function fecharModal() {
+  document.getElementById("modal-adicionais").classList.add("hidden");
+  itemSelecionado = null;
+}
+
+function confirmarAdicionais() {
+  if (!itemSelecionado) return;
+  
+  const checks = document.querySelectorAll("#lista-adicionais input:checked");
+  const adicionais = [...checks].map(c => adicionaisDisponiveis[c.value]);
+  const obs = document.getElementById("modal-obs").value;
+  
+  adicionarAoCarrinho(itemSelecionado, obs, adicionais);
+  fecharModal();
+}
+
+// ==========================================
+// CARRINHO & LÓGICA
+// ==========================================
 function adicionarAoCarrinho(item, observacao, adicionais = []) {
   const adicionaisTexto = adicionais.map(a => a.nome).join(", ");
   const precoAdicionais = adicionais.reduce((s, a) => s + a.preco, 0);
   const precoFinal = item.preco + precoAdicionais;
 
-  
   const existente = carrinho.find(i =>
     i.nome === item.nome &&
     i.observacao === observacao &&
@@ -251,7 +295,6 @@ function adicionarAoCarrinho(item, observacao, adicionais = []) {
     carrinho.push({
       nome: item.nome,
       preco: precoFinal,
-      precoUnitario: precoFinal,
       qtd: 1,
       observacao,
       adicionaisTexto
@@ -259,76 +302,17 @@ function adicionarAoCarrinho(item, observacao, adicionais = []) {
   }
 
   atualizarCarrinho();
-  atualizarBadges(); 
+  atualizarBadges();
   salvarCarrinho();
   
-  
-  animarHeaderCart();
-}
-
-function atualizarBadges() {
-  
-  const quantidades = {};
-  
-  carrinho.forEach(item => {
-    quantidades[item.nome] = (quantidades[item.nome] || 0) + item.qtd;
-  });
-  
-  
-  document.querySelectorAll('.card').forEach(card => {
-    const nome = card.dataset.nome;
-    const badge = card.querySelector('.item-quantidade');
-    const qtd = quantidades[nome] || 0;
-    
-    if (qtd > 0) {
-      badge.textContent = qtd;
-      badge.style.display = 'flex';
-    } else {
-      badge.style.display = 'none';
-    }
-  });
-  
-  
-  const totalItens = carrinho.reduce((sum, item) => sum + item.qtd, 0);
-  document.getElementById('header-cart-count').textContent = totalItens;
-  document.getElementById('cart-count').textContent = `${totalItens} item${totalItens !== 1 ? 's' : ''}`;
-}
-
-function animarHeaderCart() {
-  const headerCart = document.querySelector('.header-cart');
-  headerCart.style.transform = 'scale(1.2)';
-  setTimeout(() => {
-    headerCart.style.transform = 'scale(1)';
-  }, 200);
+  // No mobile, abre o carrinho brevemente para mostrar que adicionou (opcional)
+  if (window.innerWidth <= 900 && !cartOpen) {
+    // Pode descomentar a linha abaixo se quiser que abra automaticamente:
+    // openCart();
+  }
 }
 
 function atualizarCarrinho() {
-  function atualizarCarrinho() {
-  // ... todo seu código atual ...
-  
-  // Atualiza o mini-header do mobile (sempre visível)
-  const totalItens = carrinho.reduce((sum, item) => sum + item.qtd, 0);
-  const cartCount = document.getElementById('cart-count');
-  if (cartCount) {
-    cartCount.textContent = `${totalItens} item${totalItens !== 1 ? 's' : ''} • R$ ${formatarPreco(subtotal + taxaEntrega)}`;
-  }
-  
-  // Mostra notificação sutil quando adiciona item (mobile)
-  if (window.innerWidth <= 900 && totalItens > 0) {
-    pulseCartHeader();
-  }
-}
-
-// Animação sutil no header do carrinho quando adiciona item
-function pulseCartHeader() {
-  const header = document.querySelector('.cart-header');
-  if (header && !cartOpen) {
-    header.style.background = '#e8f5e9';
-    setTimeout(() => {
-      header.style.background = '';
-    }, 300);
-  }
-}
   const lista = document.getElementById("lista-carrinho");
   const subtotalSpan = document.getElementById("subtotal");
   const totalSpan = document.getElementById("total");
@@ -370,8 +354,11 @@ function pulseCartHeader() {
   taxaSpan.textContent = formatarPreco(taxaEntrega);
   totalSpan.textContent = formatarPreco(total);
   
-  
-  atualizarBadges();
+  // Atualiza contadores
+  const totalItens = carrinho.reduce((sum, item) => sum + item.qtd, 0);
+  document.getElementById('header-cart-count').textContent = totalItens;
+  document.getElementById('cart-count').textContent = 
+    `${totalItens} item${totalItens !== 1 ? 's' : ''} • R$ ${formatarPreco(total)}`;
 }
 
 function alterarQtd(index, delta) {
@@ -380,50 +367,36 @@ function alterarQtd(index, delta) {
     carrinho.splice(index, 1);
   }
   atualizarCarrinho();
+  atualizarBadges();
   salvarCarrinho();
 }
 
 function removerItem(index) {
   carrinho.splice(index, 1);
   atualizarCarrinho();
+  atualizarBadges();
   salvarCarrinho();
 }
 
-// Modal funcoes
-function abrirModal(item) {
-  itemSelecionado = item;
-  document.getElementById("modal-titulo").textContent = item.nome;
-  document.getElementById("modal-obs").value = "";
+function atualizarBadges() {
+  const quantidades = {};
   
-  const lista = document.getElementById("lista-adicionais");
-  lista.innerHTML = "";
-  
-  adicionaisDisponiveis.forEach((a, i) => {
-    const label = document.createElement("label");
-    label.innerHTML = `
-      <input type="checkbox" value="${i}">
-      ${a.nome} (+R$ ${formatarPreco(a.preco)})
-    `;
-    lista.appendChild(label);
+  carrinho.forEach(item => {
+    quantidades[item.nome] = (quantidades[item.nome] || 0) + item.qtd;
   });
   
-  document.getElementById("modal-adicionais").classList.remove("hidden");
-}
-
-function fecharModal() {
-  document.getElementById("modal-adicionais").classList.add("hidden");
-  itemSelecionado = null;
-}
-
-function confirmarAdicionais() {
-  if (!itemSelecionado) return;
-  
-  const checks = document.querySelectorAll("#lista-adicionais input:checked");
-  const adicionais = [...checks].map(c => adicionaisDisponiveis[c.value]);
-  const obs = document.getElementById("modal-obs").value;
-  
-  adicionarAoCarrinho(itemSelecionado, obs, adicionais);
-  fecharModal();
+  document.querySelectorAll('.card').forEach(card => {
+    const nome = card.dataset.nome;
+    const badge = card.querySelector('.item-quantidade');
+    const qtd = quantidades[nome] || 0;
+    
+    if (qtd > 0) {
+      badge.textContent = qtd;
+      badge.style.display = 'flex';
+    } else {
+      badge.style.display = 'none';
+    }
+  });
 }
 
 function calcularTaxaEntrega() {
@@ -432,6 +405,9 @@ function calcularTaxaEntrega() {
   atualizarCarrinho();
 }
 
+// ==========================================
+// FINALIZAR PEDIDO
+// ==========================================
 function finalizarPedido() {
   if (carrinho.length === 0) {
     alert("Adicione itens ao carrinho primeiro!");
@@ -442,6 +418,7 @@ function finalizarPedido() {
   if (!km || km <= 0) {
     alert("Informe a distância (km) para calcular a entrega!");
     document.getElementById("km").focus();
+    if (window.innerWidth <= 900) openCart();
     return;
   }
 
@@ -469,9 +446,14 @@ function finalizarPedido() {
     localStorage.removeItem("carrinho");
     document.getElementById("km").value = "";
     atualizarCarrinho();
+    atualizarBadges();
+    if (window.innerWidth <= 900) closeCart();
   }
 }
 
+// ==========================================
+// UTILITÁRIOS
+// ==========================================
 function formatarPreco(valor) {
   return valor.toFixed(2).replace(".", ",");
 }
@@ -495,14 +477,19 @@ function salvarCarrinho() {
 function carregarCarrinho() {
   try {
     const salvo = localStorage.getItem("carrinho");
-    if (salvo) carrinho = JSON.parse(salvo);
+    if (salvo) {
+      carrinho = JSON.parse(salvo);
+      if (!Array.isArray(carrinho)) carrinho = [];
+    }
   } catch (e) {
     carrinho = [];
   }
 }
 
 function scrollToCart() {
-  document.getElementById('cart-sidebar').scrollIntoView({ behavior: 'smooth' });
+  if (window.innerWidth <= 900) {
+    toggleCart();
+  } else {
+    document.getElementById('cart-sidebar').scrollIntoView({ behavior: 'smooth' });
+  }
 }
-
-
