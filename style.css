@@ -594,12 +594,15 @@ body {
   color: #666;
 }
 
-/* RESPONSIVIDADE MOBILE - CARRINHO COLAPSÁVEL */
+/* RESPONSIVIDADE MOBILE - CARRINHO SÓ POR TOQUE */
 @media (max-width: 900px) {
   .menu-area {
     padding: 10px;
     padding-bottom: 100px;
     padding-right: 10px;
+    /* Importante: scroll normal sem interferência */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   
   .cart-sidebar {
@@ -613,9 +616,11 @@ body {
     max-height: 80vh;
     border-radius: 20px 20px 0 0;
     box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
-    transform: translateY(calc(100% - 65px));
+    /* Só abre com a classe .open, sem interferência de scroll */
+    transform: translateY(calc(100% - 60px));
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 95;
+    touch-action: pan-y; /* Permite scroll vertical normal */
   }
   
   .cart-sidebar.open {
@@ -624,12 +629,15 @@ body {
   
   .cart-header {
     position: relative;
-    padding: 12px 20px;
+    padding: 10px 20px;
     background: linear-gradient(to bottom, #fafafa, #f0f0f0);
     border-bottom: 2px solid #e0e0e0;
-    min-height: 65px;
+    min-height: 60px;
     display: flex;
     align-items: center;
+    cursor: pointer;
+    /* Área de toque maior */
+    min-height: 60px;
   }
   
   /* Indicador de arrastar (barrinha) */
@@ -646,9 +654,10 @@ body {
   }
   
   .cart-header h2 {
-    font-size: 16px;
+    font-size: 15px;
     margin-top: 8px;
     width: 100%;
+    pointer-events: none; /* Deixa o clique passar pro header */
   }
   
   .cart-count {
@@ -659,12 +668,14 @@ body {
   .cart-content {
     max-height: 60vh;
     overflow: hidden;
+    touch-action: pan-y;
   }
   
   .cart-items {
     max-height: 40vh;
     padding: 10px 15px;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   
   .cart-footer {
@@ -693,6 +704,8 @@ body {
     z-index: 94;
     opacity: 0;
     transition: opacity 0.3s;
+    /* Permite scroll no cardápio atrás */
+    pointer-events: auto;
   }
   
   .cart-overlay.show {
