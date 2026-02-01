@@ -1,4 +1,24 @@
 // ==========================================
+// CONFIGURAÇÃO DOS ADICIONAIS - EDITE AQUI!
+// ==========================================
+const adicionaisDisponiveis = [
+  { nome: "Bacon", preco: 7 },
+  { nome: "Queijo", preco: 5 },
+  { nome: "Ovo", preco: 3 },
+  { nome: "Cebola", preco: 2 },
+  { nome: "Tomate", preco: 2 },
+  { nome: "Milho", preco: 2 },
+  { nome: "Alface", preco: 2 },
+  { nome: "Salsicha", preco: 2 },
+  { nome: "Hambúrguer", preco: 7 },
+  { nome: "Calabresa", preco: 6 },
+  { nome: "Frango desfiado", preco: 6 },
+  { nome: "Presunto e queijo", preco: 4 },
+  { nome: "Cheddar", preco: 8 },
+  { nome: "Catupiry", preco: 8 }
+];
+
+// ==========================================
 // VARIÁVEIS GLOBAIS
 // ==========================================
 let carrinho = [];
@@ -8,24 +28,6 @@ const VALOR_POR_KM = 2.00;
 let cartOpen = false;
 let touchStartY = 0;
 let touchEndY = 0;
-
-const adicionaisDisponiveis = [
-  { nome: "Bacon", preco: 7 },
-  { nome: "Queijo", preco: 5 },
-  { nome: "Ovo", preco: 3 },
-  { nome: "cebola", preco: 2},
-{ nome: "tomate", preco: 2},
-  {nome: "milho", preco: 2},
-  {nome: "alface", preco: 2},
-  {nome: "salsicha", preco: 2},
-  {nome: "hamburguer", preco: 7},
-  {nome: "calabresa", preco: 6},
-  {nome: "frango desfiado", preco: 6},
-  {nome: "presunto e queijo", preco: 4},
-  {nome: "cheddar", preco:8},
-  {nome:"catupiry", preco: 8}
-  
-];
 
 // ==========================================
 // INICIALIZAÇÃO
@@ -48,23 +50,20 @@ document.addEventListener("DOMContentLoaded", () => {
         "<p style='text-align:center;color:#666;'>Erro ao carregar cardápio. Recarregue a página.</p>";
     });
 
-  // Event Listeners básicos
   document.getElementById("km").addEventListener("input", calcularTaxaEntrega);
   document.getElementById("cancelar").addEventListener("click", fecharModal);
   document.getElementById("confirmar").addEventListener("click", confirmarAdicionais);
   document.getElementById("finalizar").addEventListener("click", finalizarPedido);
   
-  // Setup do carrinho mobile (só swipe para fechar, não para abrir)
   setupMobileCart();
 });
 
 // ==========================================
-// CARRINHO MOBILE - SÓ POR TOQUE (SEM SCROLL)
+// CARRINHO MOBILE
 // ==========================================
 function setupMobileCart() {
   const cartHeader = document.querySelector('.cart-header');
   
-  // Clique no header abre/fecha (só mobile)
   if (cartHeader) {
     cartHeader.addEventListener('click', (e) => {
       if (window.innerWidth <= 900) {
@@ -73,7 +72,6 @@ function setupMobileCart() {
     });
   }
   
-  // Swipe down para fechar (dentro do carrinho)
   const cartSidebar = document.getElementById('cart-sidebar');
   
   cartSidebar.addEventListener('touchstart', (e) => {
@@ -82,7 +80,6 @@ function setupMobileCart() {
   
   cartSidebar.addEventListener('touchend', (e) => {
     touchEndY = e.changedTouches[0].screenY;
-    // Só fecha se arrastar para baixo e o carrinho estiver aberto
     if (touchEndY - touchStartY > 50 && cartOpen && window.innerWidth <= 900) {
       closeCart();
     }
@@ -91,7 +88,6 @@ function setupMobileCart() {
 
 function toggleCart() {
   if (window.innerWidth > 900) return;
-  
   if (cartOpen) {
     closeCart();
   } else {
@@ -101,15 +97,12 @@ function toggleCart() {
 
 function openCart() {
   if (window.innerWidth > 900) return;
-  
   const cart = document.getElementById('cart-sidebar');
   const overlay = document.getElementById('cart-overlay');
   
   cart.classList.add('open');
   overlay.classList.add('show');
   cartOpen = true;
-  
-  // Previne scroll do body quando carrinho aberto
   document.body.style.overflow = 'hidden';
 }
 
@@ -120,8 +113,6 @@ function closeCart() {
   cart.classList.remove('open');
   overlay.classList.remove('show');
   cartOpen = false;
-  
-  // Libera scroll do body
   document.body.style.overflow = '';
 }
 
@@ -209,7 +200,6 @@ function darFeedbackBotao(botao) {
     setTimeout(() => card.classList.remove('added'), 500);
   }
   
-  // Feedback no header do carrinho mobile
   if (window.innerWidth <= 900) {
     const header = document.querySelector('.cart-header');
     if (header) {
@@ -227,7 +217,7 @@ function darFeedbackBotao(botao) {
 }
 
 // ==========================================
-// MODAL ADICIONAIS
+// MODAL COM QUANTIDADE DE ADICIONAIS
 // ==========================================
 function abrirModal(item) {
   itemSelecionado = item;
@@ -237,42 +227,96 @@ function abrirModal(item) {
   const lista = document.getElementById("lista-adicionais");
   lista.innerHTML = "";
   
-  adicionaisDisponiveis.forEach((a, i) => {
-    const label = document.createElement("label");
-    label.innerHTML = `
-      <input type="checkbox" value="${i}">
-      ${a.nome} (+R$ ${formatarPreco(a.preco)})
+  adicionaisDisponiveis.forEach((adicional, index) => {
+    const itemDiv = document.createElement("div");
+    itemDiv.className = "adicional-item";
+    itemDiv.dataset.index = index;
+    itemDiv.dataset.preco = adicional.preco;
+    
+    itemDiv.innerHTML = `
+      <div class="adicional-info">
+        <span class="adicional-nome">${adicional.nome}</span>
+        <span class="adicional-preco">+ R$ ${formatarPreco(adicional.preco)}</span>
+      </div>
+      <div class="adicional-controles">
+        <button type="button" class="btn-qtd" onclick="alterarQtdAdicional(${index}, -1)">−</button>
+        <span class="qtd-display" id="qtd-${index}">0</span>
+        <button type="button" class="btn-qtd" onclick="alterarQtdAdicional(${index}, 1)">+</button>
+      </div>
     `;
-    lista.appendChild(label);
+    
+    lista.appendChild(itemDiv);
   });
   
   document.getElementById("modal-adicionais").classList.remove("hidden");
 }
 
+// Variável temporária para guardar quantidades do modal
+let adicionaisTemp = {};
+
+function alterarQtdAdicional(index, delta) {
+  const display = document.getElementById(`qtd-${index}`);
+  let qtd = parseInt(display.textContent) + delta;
+  
+  if (qtd < 0) qtd = 0;
+  if (qtd > 10) qtd = 10; // Máximo 10 de cada
+  
+  display.textContent = qtd;
+  adicionaisTemp[index] = qtd;
+  
+  // Feedback visual se > 0
+  const itemDiv = display.closest('.adicional-item');
+  if (qtd > 0) {
+    itemDiv.classList.add('selecionado');
+  } else {
+    itemDiv.classList.remove('selecionado');
+  }
+}
+
 function fecharModal() {
   document.getElementById("modal-adicionais").classList.add("hidden");
   itemSelecionado = null;
+  adicionaisTemp = {}; // Limpa temporários
 }
 
 function confirmarAdicionais() {
   if (!itemSelecionado) return;
   
-  const checks = document.querySelectorAll("#lista-adicionais input:checked");
-  const adicionais = [...checks].map(c => adicionaisDisponiveis[c.value]);
+  const adicionaisSelecionados = [];
+  
+  // Pega todos os adicionais com quantidade > 0
+  adicionaisDisponiveis.forEach((adicional, index) => {
+    const qtd = parseInt(document.getElementById(`qtd-${index}`).textContent) || 0;
+    
+    if (qtd > 0) {
+      adicionaisSelecionados.push({
+        nome: adicional.nome,
+        preco: adicional.preco,
+        qtd: qtd
+      });
+    }
+  });
+  
   const obs = document.getElementById("modal-obs").value;
   
-  adicionarAoCarrinho(itemSelecionado, obs, adicionais);
+  adicionarAoCarrinho(itemSelecionado, obs, adicionaisSelecionados);
   fecharModal();
 }
 
 // ==========================================
-// CARRINHO & LÓGICA
+// CARRINHO & LÓGICA ATUALIZADA
 // ==========================================
 function adicionarAoCarrinho(item, observacao, adicionais = []) {
-  const adicionaisTexto = adicionais.map(a => a.nome).join(", ");
-  const precoAdicionais = adicionais.reduce((s, a) => s + a.preco, 0);
+  // NOVO: Formata texto dos adicionais com quantidade (ex: "2x Bacon")
+  const adicionaisTexto = adicionais.map(a => 
+    `${a.qtd}x ${a.nome}`
+  ).join(", ");
+  
+  // NOVO: Calcula preço total dos adicionais considerando quantidade
+  const precoAdicionais = adicionais.reduce((s, a) => s + (a.preco * a.qtd), 0);
   const precoFinal = item.preco + precoAdicionais;
 
+  // Verifica se já existe igual (mesmo nome, mesma obs, mesmos adicionais)
   const existente = carrinho.find(i =>
     i.nome === item.nome &&
     i.observacao === observacao &&
@@ -285,9 +329,11 @@ function adicionarAoCarrinho(item, observacao, adicionais = []) {
     carrinho.push({
       nome: item.nome,
       preco: precoFinal,
+      precoUnitario: precoFinal, // Preço já inclui adicionais
       qtd: 1,
       observacao,
-      adicionaisTexto
+      adicionaisTexto,
+      adicionaisDetalhes: adicionais // Guarda detalhes para possível edição futura
     });
   }
 
@@ -315,7 +361,7 @@ function atualizarCarrinho() {
     const li = document.createElement("li");
     li.innerHTML = `
       <div class="cart-item-info">
-        <strong>${item.nome}</strong>
+        <strong>${item.qtd}x ${item.nome}</strong>
         ${item.adicionaisTexto ? `<div class="item-details">+ ${item.adicionaisTexto}</div>` : ""}
         ${item.observacao ? `<div class="item-details" style="color:#c62828;">Obs: ${item.observacao}</div>` : ""}
       </div>
@@ -338,7 +384,6 @@ function atualizarCarrinho() {
   taxaSpan.textContent = formatarPreco(taxaEntrega);
   totalSpan.textContent = formatarPreco(total);
   
-  // Atualiza contadores
   const totalItens = carrinho.reduce((sum, item) => sum + item.qtd, 0);
   document.getElementById('header-cart-count').textContent = totalItens;
   document.getElementById('cart-count').textContent = 
@@ -390,7 +435,7 @@ function calcularTaxaEntrega() {
 }
 
 // ==========================================
-// FINALIZAR PEDIDO
+// FINALIZAR PEDIDO (ATUALIZADO)
 // ==========================================
 function finalizarPedido() {
   if (carrinho.length === 0) {
@@ -411,8 +456,14 @@ function finalizarPedido() {
 
   carrinho.forEach(item => {
     mensagem += `*${item.qtd}x ${item.nome}* - R$ ${formatarPreco(item.preco * item.qtd)}\n`;
-    if (item.adicionaisTexto) mensagem += `   _Adicionais: ${item.adicionaisTexto}_\n`;
-    if (item.observacao) mensagem += `   _Obs: ${item.observacao}_\n`;
+    
+    // NOVO: Mostra adicionais com quantidade bonitinho
+    if (item.adicionaisTexto) {
+      mensagem += `   _Extras: ${item.adicionaisTexto}_\n`;
+    }
+    if (item.observacao) {
+      mensagem += `   _Obs: ${item.observacao}_\n`;
+    }
     subtotal += item.preco * item.qtd;
   });
 
@@ -477,4 +528,3 @@ function scrollToCart() {
     document.getElementById('cart-sidebar').scrollIntoView({ behavior: 'smooth' });
   }
 }
-
