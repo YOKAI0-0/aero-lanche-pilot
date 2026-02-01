@@ -303,6 +303,32 @@ function animarHeaderCart() {
 }
 
 function atualizarCarrinho() {
+  function atualizarCarrinho() {
+  // ... todo seu código atual ...
+  
+  // Atualiza o mini-header do mobile (sempre visível)
+  const totalItens = carrinho.reduce((sum, item) => sum + item.qtd, 0);
+  const cartCount = document.getElementById('cart-count');
+  if (cartCount) {
+    cartCount.textContent = `${totalItens} item${totalItens !== 1 ? 's' : ''} • R$ ${formatarPreco(subtotal + taxaEntrega)}`;
+  }
+  
+  // Mostra notificação sutil quando adiciona item (mobile)
+  if (window.innerWidth <= 900 && totalItens > 0) {
+    pulseCartHeader();
+  }
+}
+
+// Animação sutil no header do carrinho quando adiciona item
+function pulseCartHeader() {
+  const header = document.querySelector('.cart-header');
+  if (header && !cartOpen) {
+    header.style.background = '#e8f5e9';
+    setTimeout(() => {
+      header.style.background = '';
+    }, 300);
+  }
+}
   const lista = document.getElementById("lista-carrinho");
   const subtotalSpan = document.getElementById("subtotal");
   const totalSpan = document.getElementById("total");
@@ -478,4 +504,5 @@ function carregarCarrinho() {
 function scrollToCart() {
   document.getElementById('cart-sidebar').scrollIntoView({ behavior: 'smooth' });
 }
+
 
