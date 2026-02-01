@@ -1,14 +1,7 @@
-// ==========================================
-// VARIÁVEIS GLOBAIS (dados do sistema)
-// ==========================================
-
 let carrinho = [];
 let itemSelecionado = null;
-let taxaEntrega = 0; // CORREÇÃO: Criei a variável que faltava!
-
-const VALOR_POR_KM = 2.00; // R$ 2,00 por km - fácil alterar depois
-
-const categoriasComAdicionais = ["burguer", "dogs"];
+let taxaEntrega = 0;
+const VALOR_POR_KM = 2.00;
 
 const adicionaisDisponiveis = [
   { nome: "Bacon", preco: 7 },
@@ -16,56 +9,41 @@ const adicionaisDisponiveis = [
   { nome: "Ovo", preco: 3 }
 ];
 
+let cardapioData = {};
 
 document.addEventListener("DOMContentLoaded", () => {
-
   carregarCarrinho();
   
-  // Buscar cardápio
   fetch("cardapio.json")
-    .then(res => {
-      if (!res.ok) throw new Error("Erro ao carregar cardápio");
-      return res.json();
-    })
-    .then(data => renderizarCardapio(data))
-    .catch(err => {
-      console.error("Erro:", err);
-      alert("Não foi possível carregar o cardápio. Recarregue a página.");
+    .then(res => res.json())
+    .then(data => {
+      cardapioData = data;
+      renderizarCardapio(data);
+      atualizarBadges(); 
     });
 
-  // Event listeners
-  document.getElementById("lista-carrinho").addEventListener("click", cliqueCarrinho);
-  document.getElementById("finalizar").addEventListener("click", finalizarPedido);
-  
-  // CORREÇÃO: Event listener para calcular taxa quando digitar km
   document.getElementById("km").addEventListener("input", calcularTaxaEntrega);
-  
-  // CORREÇÃO: Event listeners do modal movidos para cá (dentro do DOMContentLoaded)
   document.getElementById("cancelar").addEventListener("click", fecharModal);
   document.getElementById("confirmar").addEventListener("click", confirmarAdicionais);
+  document.getElementById("finalizar").addEventListener("click", finalizarPedido);
 });
-
-// ==========================================
-// FUNÇÕES DO CARDÁPIO
-// ==========================================
 
 function renderizarCardapio(cardapio) {
   const container = document.getElementById("cardapio");
 
   for (const categoria in cardapio) {
-    // CORREÇÃO: Verifica se é array válido
     if (!Array.isArray(cardapio[categoria])) continue;
 
     const secao = document.createElement("section");
     secao.className = "categoria";
+    secao.dataset.categoria = categoria;
 
     const titulo = document.createElement("h2");
-    // MELHORIA: Nomes amigáveis para categorias
     titulo.textContent = formatarNomeCategoria(categoria);
     secao.appendChild(titulo);
 
-    cardapio[categoria].forEach(item => {
-      const card = criarCard(item);
+    cardapio[categoria].forEach((item, index) => {
+      const card = criarCard(item, categoria, index);
       secao.appendChild(card);
     });
 
@@ -73,29 +51,35 @@ function renderizarCardapio(cardapio) {
   }
 }
 
-function criarCard(item) {
+function criarCard(item, categoria, index) {
   const card = document.createElement("div");
   card.className = "card";
-
-  // MELHORIA: Template string mais organizada
+  card.dataset.nome = item.nome; 
+  
+  const badge = document.createElement("div");
+  badge.className = "item-quantidade";
+  badge.style.display = 'none';
+  badge.id = `badge-${item.nome.replace(/\s+/g, '-')}`;
+  
   card.innerHTML = `
-    <div class="card-img">📷 Foto</div>
+    <div class="card-img">🍔</div>
     <div class="card-info">
       <h3>${item.nome}</h3>
-      ${
-        item.ingredientes
-          ? `<p class="descricao">${item.ingredientes.join(", ")}</p>`
-          : ""
-      }
+      ${item.ingredientes ? `<p class="descricao">${item.ingredientes.join(", ")}</p>` : ""}
       <div class="card-footer">
         <div class="preco">R$ ${formatarPreco(item.preco)}</div>
-        <button class="botao">Adicionar</button>
+        <button class="botao" data-nome="${item.nome}">Adicionar</button>
       </div>
     </div>
   `;
+  
+  card.appendChild(badge);
 
-  // Evento de clique no botão
-  card.querySelector(".botao").addEventListener("click", () => {
+  const botao = card.querySelector(".botao");
+  botao.addEventListener("click", () => {
+  
+    darFeedbackBotao(botao);
+    
     if (item.temAdicionais) {
       abrirModal(item);
     } else {
@@ -106,57 +90,32 @@ function criarCard(item) {
   return card;
 }
 
-// ==========================================
-// FUNÇÕES DO MODAL (Adicionais)
-// ==========================================
-
-function abrirModal(item) {
-  itemSelecionado = item;
-
-  document.getElementById("modal-titulo").textContent = item.nome;
-  document.getElementById("modal-obs").value = "";
-
-  const lista = document.getElementById("lista-adicionais");
-  lista.innerHTML = "";
-
-  adicionaisDisponiveis.forEach((a, i) => {
-    const label = document.createElement("label");
-    label.innerHTML = `
-      <input type="checkbox" value="${i}">
-      ${a.nome} (+R$ ${formatarPreco(a.preco)})
-    `;
-    lista.appendChild(label);
-  });
-
-  document.getElementById("modal-adicionais").classList.remove("hidden");
-}
-
-function fecharModal() {
-  document.getElementById("modal-adicionais").classList.add("hidden");
-  itemSelecionado = null;
-}
-
-function confirmarAdicionais() {
-  if (!itemSelecionado) return; // Segurança
+function darFeedbackBotao(botao) {
+  const textoOriginal = botao.textContent;
   
-  const checks = document.querySelectorAll("#lista-adicionais input:checked");
-  const adicionais = [...checks].map(c => adicionaisDisponiveis[c.value]);
-  const obs = document.getElementById("modal-obs").value;
-
-  adicionarAoCarrinho(itemSelecionado, obs, adicionais);
-  fecharModal();
+  botao.textContent = "✓ Adicionado!";
+  botao.classList.add("added");
+  
+  
+  const card = botao.closest('.card');
+  if (card) {
+    card.classList.add('added');
+    setTimeout(() => card.classList.remove('added'), 500);
+  }
+  
+  
+  setTimeout(() => {
+    botao.textContent = textoOriginal;
+    botao.classList.remove("added");
+  }, 1500);
 }
-
-// ==========================================
-// FUNÇÕES DO CARRINHO
-// ==========================================
 
 function adicionarAoCarrinho(item, observacao, adicionais = []) {
   const adicionaisTexto = adicionais.map(a => a.nome).join(", ");
   const precoAdicionais = adicionais.reduce((s, a) => s + a.preco, 0);
   const precoFinal = item.preco + precoAdicionais;
 
-  // Verifica se já existe igual no carrinho (para agrupar)
+  
   const existente = carrinho.find(i =>
     i.nome === item.nome &&
     i.observacao === observacao &&
@@ -169,7 +128,7 @@ function adicionarAoCarrinho(item, observacao, adicionais = []) {
     carrinho.push({
       nome: item.nome,
       preco: precoFinal,
-      precoUnitario: precoFinal, // Guarda preço unitário separado
+      precoUnitario: precoFinal,
       qtd: 1,
       observacao,
       adicionaisTexto
@@ -177,6 +136,47 @@ function adicionarAoCarrinho(item, observacao, adicionais = []) {
   }
 
   atualizarCarrinho();
+  atualizarBadges(); 
+  salvarCarrinho();
+  
+  
+  animarHeaderCart();
+}
+
+function atualizarBadges() {
+  
+  const quantidades = {};
+  
+  carrinho.forEach(item => {
+    quantidades[item.nome] = (quantidades[item.nome] || 0) + item.qtd;
+  });
+  
+  
+  document.querySelectorAll('.card').forEach(card => {
+    const nome = card.dataset.nome;
+    const badge = card.querySelector('.item-quantidade');
+    const qtd = quantidades[nome] || 0;
+    
+    if (qtd > 0) {
+      badge.textContent = qtd;
+      badge.style.display = 'flex';
+    } else {
+      badge.style.display = 'none';
+    }
+  });
+  
+  
+  const totalItens = carrinho.reduce((sum, item) => sum + item.qtd, 0);
+  document.getElementById('header-cart-count').textContent = totalItens;
+  document.getElementById('cart-count').textContent = `${totalItens} item${totalItens !== 1 ? 's' : ''}`;
+}
+
+function animarHeaderCart() {
+  const headerCart = document.querySelector('.header-cart');
+  headerCart.style.transform = 'scale(1.2)';
+  setTimeout(() => {
+    headerCart.style.transform = 'scale(1)';
+  }, 200);
 }
 
 function atualizarCarrinho() {
@@ -189,7 +189,7 @@ function atualizarCarrinho() {
   let subtotal = 0;
 
   if (carrinho.length === 0) {
-    lista.innerHTML = "<li style='text-align:center; color:#999; padding:20px;'>Carrinho vazio</li>";
+    lista.innerHTML = "<li class='empty-cart'>Seu carrinho está vazio<br>Adicione itens do cardápio</li>";
   }
 
   carrinho.forEach((item, index) => {
@@ -197,157 +197,146 @@ function atualizarCarrinho() {
 
     const li = document.createElement("li");
     li.innerHTML = `
-      <div style="flex:1;">
-        <strong>${item.qtd}x ${item.nome}</strong><br>
-        ${item.adicionaisTexto ? `<small style="color:#666;">➕ ${item.adicionaisTexto}</small><br>` : ""}
-        ${item.observacao ? `<small style="color:#c62828;">📝 ${item.observacao}</small>` : ""}
-        <div style="margin-top:4px; font-size:13px; color:#666;">
-          R$ ${formatarPreco(item.preco)} cada
-        </div>
+      <div class="cart-item-info">
+        <strong>${item.nome}</strong>
+        ${item.adicionaisTexto ? `<div class="item-details">+ ${item.adicionaisTexto}</div>` : ""}
+        ${item.observacao ? `<div class="item-details" style="color:#c62828;">Obs: ${item.observacao}</div>` : ""}
       </div>
-      <div class="controles">
-        <button data-acao="menos" data-index="${index}">−</button>
-        <span style="font-weight:bold; min-width:20px; text-align:center;">${item.qtd}</span>
-        <button data-acao="mais" data-index="${index}">+</button>
-        <button class="lixeira" data-acao="remover" data-index="${index}">🗑️</button>
+      <div class="cart-item-controls">
+        <div class="qtd-controls">
+          <button class="qtd-btn" onclick="alterarQtd(${index}, -1)">−</button>
+          <span class="qtd-value">${item.qtd}</span>
+          <button class="qtd-btn" onclick="alterarQtd(${index}, 1)">+</button>
+        </div>
+        <span class="item-total">R$ ${formatarPreco(item.preco * item.qtd)}</span>
+        <button class="remove-btn" onclick="removerItem(${index})">🗑️</button>
       </div>
     `;
-
     lista.appendChild(li);
   });
 
-  // CORREÇÃO: Calcula totais corretamente agora
   const total = subtotal + taxaEntrega;
   
   subtotalSpan.textContent = formatarPreco(subtotal);
   taxaSpan.textContent = formatarPreco(taxaEntrega);
   totalSpan.textContent = formatarPreco(total);
+  
+  
+  atualizarBadges();
+}
 
+function alterarQtd(index, delta) {
+  carrinho[index].qtd += delta;
+  if (carrinho[index].qtd <= 0) {
+    carrinho.splice(index, 1);
+  }
+  atualizarCarrinho();
   salvarCarrinho();
 }
 
-function cliqueCarrinho(e) {
-  if (!e.target.dataset.acao) return;
+function removerItem(index) {
+  carrinho.splice(index, 1);
+  atualizarCarrinho();
+  salvarCarrinho();
+}
 
-  const acao = e.target.dataset.acao;
-  const index = Number(e.target.dataset.index);
+// Modal funcoes
+function abrirModal(item) {
+  itemSelecionado = item;
+  document.getElementById("modal-titulo").textContent = item.nome;
+  document.getElementById("modal-obs").value = "";
+  
+  const lista = document.getElementById("lista-adicionais");
+  lista.innerHTML = "";
+  
+  adicionaisDisponiveis.forEach((a, i) => {
+    const label = document.createElement("label");
+    label.innerHTML = `
+      <input type="checkbox" value="${i}">
+      ${a.nome} (+R$ ${formatarPreco(a.preco)})
+    `;
+    lista.appendChild(label);
+  });
+  
+  document.getElementById("modal-adicionais").classList.remove("hidden");
+}
 
-  if (!carrinho[index]) return;
+function fecharModal() {
+  document.getElementById("modal-adicionais").classList.add("hidden");
+  itemSelecionado = null;
+}
 
-  if (acao === "mais") {
-    carrinho[index].qtd++;
-  } else if (acao === "menos") {
-    carrinho[index].qtd--;
-    if (carrinho[index].qtd <= 0) {
-      carrinho.splice(index, 1);
-    }
-  } else if (acao === "remover") {
-    carrinho.splice(index, 1);
-  }
+function confirmarAdicionais() {
+  if (!itemSelecionado) return;
+  
+  const checks = document.querySelectorAll("#lista-adicionais input:checked");
+  const adicionais = [...checks].map(c => adicionaisDisponiveis[c.value]);
+  const obs = document.getElementById("modal-obs").value;
+  
+  adicionarAoCarrinho(itemSelecionado, obs, adicionais);
+  fecharModal();
+}
 
+function calcularTaxaEntrega() {
+  const km = parseFloat(document.getElementById("km").value);
+  taxaEntrega = (isNaN(km) || km < 0) ? 0 : km * VALOR_POR_KM;
   atualizarCarrinho();
 }
 
-// ==========================================
-// FUNÇÕES DE ENTREGA
-// ==========================================
-
-function calcularTaxaEntrega() {
-  const input = document.getElementById("km");
-  const km = parseFloat(input.value);
-  
-  // Validação: se não for número ou for negativo
-  if (isNaN(km) || km < 0) {
-    taxaEntrega = 0;
-  } else {
-    taxaEntrega = km * VALOR_POR_KM;
-  }
-  
-  atualizarCarrinho(); // Recalcula o total na tela
-}
-
-// ==========================================
-// FINALIZAR PEDIDO
-// ==========================================
-
 function finalizarPedido() {
   if (carrinho.length === 0) {
-    alert("Seu carrinho está vazio! Adicione alguns lanches primeiro. 🍔");
+    alert("Adicione itens ao carrinho primeiro!");
     return;
   }
-
-  const inputKm = document.getElementById("km");
-  const km = parseFloat(inputKm.value);
   
+  const km = parseFloat(document.getElementById("km").value);
   if (!km || km <= 0) {
-    alert("Por favor, informe a distância (km) para calcularmos a entrega!");
-    inputKm.focus();
+    alert("Informe a distância (km) para calcular a entrega!");
+    document.getElementById("km").focus();
     return;
   }
 
-  let mensagem = "🍔 *Pedido Aero Lanche*\n";
-  mensagem += "───────────────────\n\n";
-  
+  let mensagem = "🍔 *Pedido Aero Lanche*\n\n";
   let subtotal = 0;
 
   carrinho.forEach(item => {
-    mensagem += `*${item.qtd}x ${item.nome}*\n`;
-    mensagem += `💵 R$ ${formatarPreco(item.preco * item.qtd)}\n`;
-    
-    if (item.adicionaisTexto) {
-      mensagem += `   ➕ Adicionais: ${item.adicionaisTexto}\n`;
-    }
-    if (item.observacao) {
-      mensagem += `   📝 Obs: ${item.observacao}\n`;
-    }
-    mensagem += "\n";
-    
+    mensagem += `*${item.qtd}x ${item.nome}* - R$ ${formatarPreco(item.preco * item.qtd)}\n`;
+    if (item.adicionaisTexto) mensagem += `   _Adicionais: ${item.adicionaisTexto}_\n`;
+    if (item.observacao) mensagem += `   _Obs: ${item.observacao}_\n`;
     subtotal += item.preco * item.qtd;
   });
 
-  mensagem += "───────────────────\n";
-  mensagem += `*Subtotal:* R$ ${formatarPreco(subtotal)}\n`;
-  mensagem += `*Entrega (${km.toFixed(1)}km):* R$ ${formatarPreco(taxaEntrega)}\n`;
-  mensagem += `*TOTAL:* R$ ${formatarPreco(subtotal + taxaEntrega)}\n\n`;
-  mensagem += "Obrigado pela preferência! 😊";
-
-  if (!confirm("Deseja enviar o pedido pelo WhatsApp?\n\nTotal: R$ " + formatarPreco(subtotal + taxaEntrega))) {
-    return;
-  }
+  mensagem += `\n*Subtotal:* R$ ${formatarPreco(subtotal)}`;
+  mensagem += `\n*Entrega (${km}km):* R$ ${formatarPreco(taxaEntrega)}`;
+  mensagem += `\n*TOTAL:* R$ ${formatarPreco(subtotal + taxaEntrega)}`;
 
   const telefone = "5543991547109";
   const url = `https://wa.me/${telefone}?text=${encodeURIComponent(mensagem)}`;
   
-  window.open(url, "_blank");
-
-  carrinho = [];
-  taxaEntrega = 0;
-  inputKm.value = "";
-  localStorage.removeItem("carrinho");
-  atualizarCarrinho();
-  
-  // Feedback visual
-  alert("Pedido enviado! Aguarde nosso contato. 📱");
+  if (confirm("Enviar pedido pelo WhatsApp?")) {
+    window.open(url, "_blank");
+    carrinho = [];
+    taxaEntrega = 0;
+    localStorage.removeItem("carrinho");
+    document.getElementById("km").value = "";
+    atualizarCarrinho();
+  }
 }
-
-// ==========================================
-// UTILITÁRIOS (funções auxiliares)
-// ==========================================
 
 function formatarPreco(valor) {
   return valor.toFixed(2).replace(".", ",");
 }
 
-function formatarNomeCategoria(categoria) {
+function formatarNomeCategoria(cat) {
   const nomes = {
-    "burguer": "🍔 Hambúrgueres",
-    "dogs": "🌭 Cachorros-Quentes",
+    "burguer": "🍔 Hamburgers",
+    "dogs": "🌭 Hot Dogs",
     "porcoes": "🍟 Porções",
     "bebidas": "🥤 Bebidas",
     "refrigerantes_600ml": "🧃 Refri 600ml",
     "cervejas": "🍺 Cervejas"
   };
-  return nomes[categoria] || categoria.toUpperCase();
+  return nomes[cat] || cat;
 }
 
 function salvarCarrinho() {
@@ -357,12 +346,12 @@ function salvarCarrinho() {
 function carregarCarrinho() {
   try {
     const salvo = localStorage.getItem("carrinho");
-    if (salvo) {
-      carrinho = JSON.parse(salvo);
-      if (!Array.isArray(carrinho)) carrinho = [];
-    }
+    if (salvo) carrinho = JSON.parse(salvo);
   } catch (e) {
-    console.error("Erro ao carregar carrinho:", e);
     carrinho = [];
   }
+}
+
+function scrollToCart() {
+  document.getElementById('cart-sidebar').scrollIntoView({ behavior: 'smooth' });
 }
