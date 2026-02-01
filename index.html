@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta name="description" content="Aero Lanche - Melhor hamburgueria artesanal da cidade. Delivery rápido, lanches frescos e suculentos.">
-<meta name="keywords" content="hamburgueria, delivery, lanche, hamburguer artesanal, londrina">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Aero Lanche</title>
@@ -10,6 +8,7 @@
 </head>
 
 <body>
+  <!-- MODAL ADICIONAIS -->
   <div id="modal-adicionais" class="modal hidden">
     <div class="modal-content">
       <h3 id="modal-titulo"></h3>
@@ -22,36 +21,60 @@
     </div>
   </div>
 
+  <!-- HEADER FIXO COM CARRINHO RESUMIDO (MOBILE) -->
   <header class="topo">
-    <h1>🍔 Aero Lanche</h1>
+    <div class="header-content">
+      <h1>🍔 Aero Lanche</h1>
+      <div class="header-cart" onclick="scrollToCart()">
+        🛒 <span id="header-cart-count">0</span>
+      </div>
+    </div>
   </header>
 
-  <main>
-    <!-- CARDÁPIO -->
-    <div id="cardapio"></div>
+  <div class="app-container">
+    <!-- ÁREA DO CARDÁPIO (Scrollável) -->
+    <main class="menu-area">
+      <div id="cardapio"></div>
+      
+      <!-- Espaço para não ficar atrás do carrinho fixo (mobile) -->
+      <div class="spacer"></div>
+    </main>
 
-    <hr />
+    <!-- CARRINHO FIXO (Sidebar/Desktop | Bottom/Mobile) -->
+    <aside class="cart-sidebar" id="cart-sidebar">
+      <div class="cart-header">
+        <h2>🛒 Seu Pedido</h2>
+        <span class="cart-count" id="cart-count">0 itens</span>
+      </div>
+      
+      <ul id="lista-carrinho" class="cart-items">
+        <li class="empty-cart">Seu carrinho está vazio</li>
+      </ul>
 
-    <!-- CARRINHO -->
-    <section id="carrinho-container">
-      <h2>🛒 Carrinho</h2>
-      <ul id="lista-carrinho"></ul>
-
-      <div class="totais">
-        <p>Subtotal: R$ <span id="subtotal">0,00</span></p>
-        
+      <div class="cart-footer">
         <div class="entrega">
-          <label>Distância (km):</label>
+          <label>📍 Distância (km):</label>
           <input type="number" id="km" step="0.1" placeholder="Ex: 3.2" min="0">
-          <p>Taxa de entrega: R$ <span id="taxa">0,00</span></p>
+          <p class="taxa-line">Taxa de entrega: <strong>R$ <span id="taxa">0,00</span></strong></p>
         </div>
 
-        <p class="total-final">Total: R$ <span id="total">0,00</span></p>
-      </div>
+        <div class="totals">
+          <div class="subtotal-line">
+            <span>Subtotal:</span>
+            <strong>R$ <span id="subtotal">0,00</span></strong>
+          </div>
+          <div class="total-line">
+            <span>Total:</span>
+            <strong>R$ <span id="total">0,00</span></strong>
+          </div>
+        </div>
 
-      <button id="finalizar">Finalizar Pedido no WhatsApp</button>
-    </section>
-  </main>
+        <button id="finalizar" class="checkout-btn">
+          Finalizar Pedido
+        </button>
+      </div>
+    </aside>
+  </div>
 
   <script src="script.js"></script>
 </body>
