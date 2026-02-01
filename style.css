@@ -469,39 +469,129 @@ body {
   height: 100px;
 }
 
+/* RESPONSIVIDADE MOBILE - CARRINHO INTELIGENTE */
 @media (max-width: 900px) {
   .menu-area {
-    padding-right: 20px; 
+    padding: 10px;
+    padding-bottom: 100px; /* Espaço para o carrinho minimizado */
   }
   
+  /* CARRINHO COLAPSÁVEL NO MOBILE */
   .cart-sidebar {
     position: fixed;
     bottom: 0;
-    top: auto;
     left: 0;
     right: 0;
+    top: auto;
     width: 100%;
     height: auto;
-    max-height: 50vh;
+    max-height: 70vh;
     border-radius: 20px 20px 0 0;
     box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+    transform: translateY(calc(100% - 70px)); /* Mostra só o header (70px) */
+    transition: transform 0.3s ease-out;
+    z-index: 95;
+  }
+  
+  /* Quando aberto */
+  .cart-sidebar.open {
+    transform: translateY(0);
+  }
+  
+  /* Handle/indicador de arrastar */
+  .cart-header {
+    position: relative;
+    cursor: pointer;
+    padding: 15px 20px;
+    background: linear-gradient(to bottom, #fafafa, #f0f0f0);
+    border-bottom: 2px solid #e0e0e0;
+  }
+  
+  /* Indicador visual (barrinha de arrastar) */
+  .cart-header::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 4px;
+    background: #ccc;
+    border-radius: 2px;
+  }
+  
+  .cart-header h2 {
+    font-size: 16px;
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .cart-count {
+    font-size: 14px;
+    color: var(--cor-primaria);
+    font-weight: bold;
   }
   
   .cart-items {
-    max-height: 30vh;
+    max-height: 40vh;
+    padding: 10px 15px;
   }
   
-  .app-container {
-    margin-bottom: 200px; 
+  .cart-footer {
+    padding: 15px;
+    padding-bottom: 25px; /* Espaço extra pra não ficar colado no final do celular */
   }
   
+  /* Overlay escuro quando carrinho aberto (fecha ao clicar fora) */
+  .cart-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 94;
+  }
+  
+  .cart-overlay.show {
+    display: block;
+  }
+  
+  /* Card menor no mobile */
   .card {
-    padding: 12px;
+    padding: 10px;
   }
   
   .card-img {
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
+    font-size: 30px;
+  }
+  
+  .card-info h3 {
+    font-size: 15px;
+  }
+  
+  .preco {
+    font-size: 16px;
+  }
+  
+  .botao {
+    padding: 8px 12px;
+    font-size: 13px;
+    min-width: 80px;
+  }
+  
+ 
+  .item-quantidade {
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+    top: -6px;
+    right: -6px;
   }
 }
 
@@ -609,3 +699,4 @@ body {
   background: #f0f0f0;
   color: #666;
 }
+
