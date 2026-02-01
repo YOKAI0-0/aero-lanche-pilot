@@ -1,6 +1,4 @@
-// ==========================================
-// CONFIGURAÇÃO DOS ADICIONAIS - EDITE AQUI!
-// ==========================================
+
 const adicionaisDisponiveis = [
   { nome: "Bacon", preco: 7 },
   { nome: "Queijo", preco: 5 },
@@ -18,9 +16,7 @@ const adicionaisDisponiveis = [
   { nome: "Catupiry", preco: 8 }
 ];
 
-// ==========================================
-// VARIÁVEIS GLOBAIS
-// ==========================================
+
 let carrinho = [];
 let itemSelecionado = null;
 let taxaEntrega = 0;
@@ -28,10 +24,7 @@ const VALOR_POR_KM = 2.00;
 let cartOpen = false;
 let touchStartY = 0;
 let touchEndY = 0;
-
-// ==========================================
-// INICIALIZAÇÃO
-// ==========================================
+
 document.addEventListener("DOMContentLoaded", () => {
   carregarCarrinho();
   
